@@ -43,7 +43,7 @@ def validate_manifest(manifest):
     fields = {"id", "version", "apiVersion", "runtime", "entry", "permissions", "dependencies"}
     if not isinstance(manifest, dict) or set(manifest) != fields:
         raise ValueError("Invalid manifest fields")
-    if type(manifest["apiVersion"]) is not int or manifest["apiVersion"] != 1 or manifest["runtime"] != "lua":
+    if type(manifest["apiVersion"]) is not int or manifest["apiVersion"] not in (1, 2) or manifest["runtime"] != "lua":
         raise ValueError("Unsupported runtime or API")
     validate_id(manifest["id"])
     validate_version(manifest["version"])
@@ -52,10 +52,14 @@ def validate_manifest(manifest):
         raise ValueError("The scaffold expects a Lua entry in the module root")
     permissions = manifest["permissions"]
     allowed = {"terminal.print", "system.device", "system.battery", "ui.window", "ui.tile"}
+    if manifest["apiVersion"] == 2:
+        allowed = {"ui.tile", "state.local", "system.battery", "system.time"}
     if not isinstance(permissions, list) or not all(isinstance(p, str) and p in allowed for p in permissions):
         raise ValueError("Invalid permissions")
     if len(set(permissions)) != len(permissions):
         raise ValueError("Duplicate permission")
+    if manifest["apiVersion"] == 2 and "ui.tile" not in permissions:
+        raise ValueError("Plugin API v2 requires ui.tile")
     dependencies = manifest["dependencies"]
     if not isinstance(dependencies, dict) or len(dependencies) > 16 or manifest["id"] in dependencies:
         raise ValueError("Invalid dependencies")
