@@ -1,2 +1,10 @@
 # HyprDroid-Packages
-Reviewed HyprDroid module packages and signed catalogue
+
+Локальный черновик будущего репозитория. `hello-tile` показывает счётчик с Increment и Reset и хранит значение через Tile API. Публикация и запуск внешних тайлов требуют отдельных решений владельца.
+
+```sh
+python3 tools/package.py build modules/hello-tile dist
+python3 -m zipfile -t dist/hello-tile-1.0.0.hyp
+```
+
+[Публикация и формат](docs/PUBLISH.md)

@@ -1,0 +1,23 @@
+name: Verify packages
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: |
+          for module in modules/*; do
+            python3 tools/package.py build "$module" dist
+          done
+          for artifact in dist/*.hyp; do
+            python3 -m zipfile -t "$artifact"
+          done
