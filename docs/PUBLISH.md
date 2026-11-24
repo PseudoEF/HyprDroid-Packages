@@ -16,3 +16,14 @@ python3 tools/package.py catalog --key /secure/publisher.pem --key-id github-v1 
 Архив `.hyp` — ZIP с корневым UTF-8 manifest.json и Lua entry. Подпись артефакта Ed25519 покрывает точные байты ZIP. Конверт каталога содержит keyId, Base64 payload и hex signature. Ed25519 подписывает ASCII-префикс `HyprDroid catalog v1` с LF, за которым идут точные декодированные байты payload. Payload содержит schemaVersion, repository, возрастающую revision и записи packages. Каждая запись включает полный manifest, sha256, signature, url и status. Для отзыва передайте предыдущий payload, повышенную ревизию и `--revoke <package-id>` при подписи. Не удаляйте старые ID из каталога.
 
 PR CI обладает только правами чтения, собирает пакеты и проверяет целостность ZIP. Публикация выполняется вручную после ревью. Закрытый ключ и учётные данные публикации никогда не доступны PR.
+
+## First-party and community packages
+
+Owner-authored first-party packages require explicit owner approval, successful CI, artifact
+verification and the trusted publisher signature. Independent review is required for community
+packages in addition to CI, verification and signing. Community publication remains closed
+until its review process is available.
+
+Keep `catalog-v1/catalog.json` as the API v1 compatibility endpoint. The mixed API catalogue
+continues the same signed revision history at `catalog-v2/catalog.json`. Archive each signed
+revision as `catalog-r<N>.json` and upload it only after verifying every referenced release asset.
